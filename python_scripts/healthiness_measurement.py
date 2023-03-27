@@ -1,13 +1,14 @@
 import sys
 import os
 from os import path
-import numpy as np
 import pandas as pd
 import torch
 import nibabel as nib
 from nilearn.image import resample_to_img
 
 from python_scripts.metrics import ssim_map_3D, mse_in_mask, ssim_in_mask, minkowski_distance
+
+from clinica.utils.inputs import RemoteFileStructure, fetch_file
 
 maps_directory = sys.argv[1]
 pathology = sys.argv[2]
@@ -21,14 +22,35 @@ df = pd.read_csv(tsv_file, sep="\t", usecols=["participant_id", "session_id"])
 sessions_list = list(df.to_records(index=False))
 
 # Load region masks
-caps_directory = "/gpfswork/rech/krk/commun/datasets/adni/caps/caps_pet_uniform"
+caps_directory = sys.argv[4]
 img_path = path.join(caps_directory,
                      "subjects",
                      "sub-ADNI002S0685",
                      "ses-M48",
                      "t1_linear",
                      "sub-ADNI002S0685_ses-M48_T1w_space-MNI152NLin2009cSym_desc-Crop_res-1x1x1_T1w.nii.gz")
-mask_path = path.join(caps_directory, "masks", f"mask_hypo_{pathology}.nii")
+
+mask_directory = "masks"
+url_aramis = "https://aramislab.paris.inria.fr/files/data/masks/hypo/"
+FILE1 = RemoteFileStructure(
+    filename=f"mask_hypo_{pathology}.nii",
+    url=url_aramis,
+    checksum="drgjeryt",
+)
+if not path.exists(mask_directory):
+    os.makedirs(mask_directory)
+
+if not path.isfile(path.join(mask_directory, f"mask_hypo_{pathology}.nii")):
+    try:
+        mask_path = fetch_file(FILE1, mask_directory)
+    except:
+        raise(
+            """Unable to download masks, please download them
+            manually at https://aramislab.paris.inria.fr/files/data/masks/
+            and provide a valid path."""
+        )
+else:
+    mask_path = path.join(mask_directory, f"mask_hypo_{pathology}.nii")
 
 mask_nii = nib.load(mask_path)
 mask_nii = resample_to_img(mask_nii, nib.load(img_path), interpolation='nearest')

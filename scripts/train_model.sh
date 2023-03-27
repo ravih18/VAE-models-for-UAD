@@ -8,4 +8,5 @@
 #SBATCH --account=krk@v100
 
 echo $1
-python python_scripts/train_model.py $1
+source config.sh
+python python_scripts/train_model.py $1 $CAPS_DIR $PARTICIPANTS_TSV_FOLDER

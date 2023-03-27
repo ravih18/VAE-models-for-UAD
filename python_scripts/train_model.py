@@ -11,10 +11,10 @@ from train_utils import get_model_parameters, get_parameters_dict, return_datase
 
 
 # Define paths
-CAPS_DIR = "/gpfswork/rech/krk/commun/datasets/adni/caps/caps_pet_uniform/"
-TSV_PATH = "/gpfswork/rech/krk/usy14zi/vae_benchmark/adni_tsv/deep_learning_exp/train"
+CAPS_DIR = sys.argv[2]
+TSV_PATH = path.join(sys.argv[3], "train")
 
-config_folder = "/gpfswork/rech/krk/usy14zi/vae_benchmark/config/"
+config_folder = "./config/"
 config_path = {
     'VAE': path.join(config_folder, 'vae_config.toml'),
     'Beta_VAE': path.join(config_folder, 'beta_vae_config.toml'),
@@ -56,7 +56,7 @@ def train(model_name):
     train_dataset, eval_dataset = return_datasets(parameters)
 
     # Inialise MAPS
-    maps_dir = path.join("/gpfswork/rech/krk/usy14zi/vae_benchmark/models", f"MAPS_{model_name}")
+    maps_dir = path.join("./models", f"MAPS_{model_name}")
     maps_manager = MapsManager(maps_dir, parameters, verbose="info")
     # Create model output dir
     model_dir = path.join(maps_dir, "split-0", "best-loss")

@@ -1,5 +1,6 @@
 def get_parameters_dict(config_toml, caps_directory, tsv_path):
 
+    from os import path
     from clinicadl.train.train_utils import build_train_dict
     from clinicadl.utils.preprocessing import read_preprocessing
 
@@ -11,9 +12,8 @@ def get_parameters_dict(config_toml, caps_directory, tsv_path):
     parameters["network_task"] = "reconstruction"
     parameters["input_size"] = (1, 80, 96, 80)
     parameters["preprocessing_dict"] = read_preprocessing(
-            "/gpfswork/rech/krk/commun/datasets/adni/"\
-            "caps/caps_pet_uniform/tensor_extraction/"\
-            "extract_pet_uniform_image.json")
+            path.join(caps_directory, "tensor_extraction/extract_pet_uniform_image.json")
+    )
 
     return parameters
 
